@@ -24,56 +24,65 @@
     <!-- ================================== -->
     <camelContext id="multiple-netty-codecs-context" xmlns="http://camel.apache.org/schema/spring">
         <route id="_Schenario1">
-            <from id="_to2" uri="netty:tcp://localhost:7000?requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
-            <log id="_showInput" message="Input TCP Dum HLI : ${body}"/>
-            <unmarshal id="_unmarshal1">
-                <flatpack definition="FlconfigIn.xml" fixed="true" ignoreFirstRecord="false"/>
-            </unmarshal>
+            <from id="_to2" uri="netty:tcp://0.0.0.0:7000?allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
+            <doTry id="_doTry1">
+                <log id="_showInput" message="Input HLI TCp Router : ${body}"/>
+                <unmarshal id="_unmarshal1">
+                    <flatpack definition="FlconfigIn.xml" fixed="true" ignoreFirstRecord="false"/>
+                </unmarshal>
+                <!-- <to id="to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
+                <!-- <log id="_log2" message="${body}"/> -->
+                <log id="_showSwitchCode" message="Switch Code : ${body.get(0).get(SWITCH_CODE)}"/>
+                <choice id="_choice1">
+                    <when id="_when2">
+                        <simple>${body.get(0).get(SWITCH_CODE)} == 'HOBI'</simple>
+                        <log id="_log2" message="Choosen 2 : ${body.get(0).get(SWITCH_CODE)}"/>
+                        <setBody id="_setBody1">
+                            <simple>Error:UNDER MAINTENANCE :*</simple>
+                        </setBody>
+                    </when>
+                    <when id="_when1">
+                        <simple>${body.get(0).get(SWITCH_CODE)} == 'RAPI'</simple>
+                        <log id="_log1" message="Choosen 1 : ${body.get(0).get(SWITCH_CODE)}"/>
+                        <marshal id="_marshal1">
+                            <flatpack definition="FlconfigIn.xml"
+                                fixed="true" ignoreFirstRecord="false"/>
+                        </marshal>
+                        <throttle id="_throttle1">
+                            <constant>2</constant>
+                            <to id="_to_Incoming_HLI" uri="netty:tcp://192.168.88.98:49810?requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
+                        </throttle>
+                        <log id="_responseHli" message="After Call TCP HLI (from HLI TCP Router):  ${body}"/>
+                        <!-- <to id="_to1" uri="sql:Insert into EMPLOYEE (ID,NAME,DIVISION,ADDRESS) 
+							values ('4','NAME DDD','DIVISI D','ALAMAT D')?dataSource=#jdbc-oracle"/> -->
+                    </when>
+                    <otherwise id="_otherwise1">
+                        <log id="_log3" message="Choosen 3 : ${body.get(0).get(SWITCH_CODE)}"/>
+                        <setBody id="_setBody2">
+                            <simple>Error:The transaction cannot be executed because the SWITCH CODE is not recognized</simple>
+                        </setBody>
+                    </otherwise>
+                </choice>
+                <doCatch id="_AllError">
+                    <!-- catch multiple exceptions -->
+                    <exception>java.io.IOException</exception>
+                    <exception>java.lang.IllegalStateException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.net.ConnectException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                    <setBody id="_setBody3">
+                        <simple>Error:${exception.message}</simple>
+                    </setBody>
+                    <log id="_log4" message="TCP Router Response Body : ${body}"/>
+                </doCatch>
+            </doTry>
             <!-- <to id="to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
             <!-- <log id="_log2" message="${body}"/> -->
-            <log id="_showSwitchCode" message="Switch Code : ${body.get(0).get(SWITCH_CODE)}"/>
-            <choice id="_choice1">
-                <when id="_when2">
-                    <simple>${body.get(0).get(SWITCH_CODE)} == 'HOBI'</simple>
-                    <log id="_log2" message="Choosen 2 : ${body.get(0).get(SWITCH_CODE)}"/>
-                    <marshal id="_marshal2">
-                        <flatpack definition="FlconfigIn.xml"
-                            fixed="true" ignoreFirstRecord="false"/>
-                    </marshal>
-                    <setBody id="_setBody1">
-                        <simple>Test OK</simple>
-                    </setBody>
-                </when>
-                <when id="_when1">
-                    <simple>${body.get(0).get(SWITCH_CODE)} == 'RAPI'</simple>
-                    <log id="_log1" message="Choosen 1 : ${body.get(0).get(SWITCH_CODE)}"/>
-                    <marshal id="_marshal1">
-                        <flatpack definition="FlconfigIn.xml"
-                            fixed="true" ignoreFirstRecord="false"/>
-                    </marshal>
-                    <to id="_to_Incoming_HLI" uri="netty:tcp://localhost:7001?requestTimeout=3000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
-                    <log id="_responseHli" message="After Call TCP HLI :  ${body}"/>
-                    <!-- <to id="_to1" uri="sql:Insert into EMPLOYEE (ID,NAME,DIVISION,ADDRESS) 
-						values ('4','NAME DDD','DIVISI D','ALAMAT D')?dataSource=#jdbc-oracle"/> -->
-                    <log id="_log4" message="About to change property test from value ${properties:test} to value (${properties:test} + 1). Initial value was {{test}}"/>
-                    <setProperty id="_setProperty2" propertyName="counter">
-                        <simple>${properties:test}</simple>
-                    </setProperty>
-                    <process id="_process1" ref="generateCounter"/>
-                    <log id="_log5" message="New value is ${properties:test}"/>
-                </when>
-                <otherwise id="_otherwise1">
-                    <log id="_log3" message="Choosen 3 : ${body.get(0).get(SWITCH_CODE)}"/>
-                    <marshal id="_marshal3">
-                        <flatpack definition="FlconfigIn.xml"
-                            fixed="true" ignoreFirstRecord="false"/>
-                    </marshal>
-                    <setProperty id="_setProperty1" propertyName="counter">
-                        <simple>0</simple>
-                    </setProperty>
-                    <bean id="_bean1" method="setProperty(test, 0)" ref="myProperties"/>
-                </otherwise>
-            </choice>
         </route>
     </camelContext>
     <!-- ================================== -->
