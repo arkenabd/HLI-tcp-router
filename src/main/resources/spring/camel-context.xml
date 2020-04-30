@@ -4,14 +4,11 @@
     xmlns:camel="http://camel.apache.org/schema/spring"
     xmlns:context="http://www.springframework.org/schema/context"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="     http://www.springframework.org/schema/beans      http://www.springframework.org/schema/beans/spring-beans.xsd      http://www.springframework.org/schema/context      http://www.springframework.org/schema/context/spring-context.xsd     http://camel.apache.org/schema/spring     http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <context:component-scan base-package="com.shengwang.example"/>
-    <!--  <bean
-        class="org.springframework.jdbc.datasource.SimpleDriverDataSource" id="jdbc-oracle">
-        <property name="driverClass" value="${jdbc.oracle.driverClass}"/>
-        <property name="url" value="${jdbc.oracle.url}"/>
-        <property name="username" value="${jdbc.oracle.username}"/>
-        <property name="password" value="${jdbc.oracle.password}"/>
-    </bean> -->
+    <!-- <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource" 
+		id="jdbc-oracle"> <property name="driverClass" value="${jdbc.oracle.driverClass}"/> 
+		<property name="url" value="${jdbc.oracle.url}"/> <property name="username" 
+		value="${jdbc.oracle.username}"/> <property name="password" value="${jdbc.oracle.password}"/> 
+		</bean> -->
     <bean class="java.util.Properties" id="myProperties"/>
     <bean
         class="org.apache.camel.component.properties.PropertiesComponent" id="properties">
@@ -19,10 +16,17 @@
         <property name="location" value="classpath:application.properties"/>
         <property name="overrideProperties" ref="myProperties"/>
     </bean>
+    <bean class="org.apache.camel.impl.DefaultShutdownStrategy" id="defaultShutdownStrategy">
+        <property name="timeout" value="10"/>
+        <property name="suppressLoggingOnTimeout" value="true"/>
+        <property name="shutdownNowOnTimeout" value="true"/>
+    </bean>
     <!-- ================================== -->
     <!-- Define camel context -->
     <!-- ================================== -->
-    <camelContext id="multiple-netty-codecs-context" xmlns="http://camel.apache.org/schema/spring">
+    <camelContext id="multiple-netty-codecs-context"
+        shutdownRoute="Default"
+        shutdownRunningTask="CompleteCurrentTaskOnly" xmlns="http://camel.apache.org/schema/spring">
         <route id="_Schenario1">
             <from id="_to2" uri="netty:tcp://0.0.0.0:7000?requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
             <doTry id="_doTry1">
@@ -50,7 +54,7 @@
                         </marshal>
                         <throttle id="_throttle1" timePeriodMillis="10000">
                             <constant>2</constant>
-                            <to id="_to_Incoming_HLI" uri="netty:tcp://192.168.88.98:49810?requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
+                            <to id="_to_Incoming_HLI" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;keepAlive=false&amp;disconnect=true"/>
                         </throttle>
                         <log id="_responseHli" message="After Call TCP HLI (from HLI TCP Router):  ${body}"/>
                         <!-- <to id="_to1" uri="sql:Insert into EMPLOYEE (ID,NAME,DIVISION,ADDRESS) 
@@ -94,4 +98,5 @@
     <bean class="org.jboss.netty.handler.codec.string.StringEncoder" id="stringEncoder"/>
     <bean class="com.netty.fuse.GenerateFLDum" id="generateResultDum" scope="singleton"/>
     <bean class="com.netty.fuse.GenerateCounter" id="generateCounter" scope="singleton"/>
+    <bean class="com.netty.fuse.KillRoute" id="killRoute" scope="singleton"/>
 </beans>
