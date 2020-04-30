@@ -54,7 +54,7 @@
                         </marshal>
                         <throttle id="_throttle1" timePeriodMillis="10000">
                             <constant>2</constant>
-                            <to id="_to_Incoming_HLI" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;keepAlive=false&amp;disconnect=true"/>
+                            <to id="_to_Incoming_HLI" uri="netty:tcp://192.168.88.98:49810?disconnect=true&amp;keepAlive=false&amp;clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
                         </throttle>
                         <log id="_responseHli" message="After Call TCP HLI (from HLI TCP Router):  ${body}"/>
                         <!-- <to id="_to1" uri="sql:Insert into EMPLOYEE (ID,NAME,DIVISION,ADDRESS) 
