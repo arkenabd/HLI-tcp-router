@@ -71,7 +71,7 @@
                                 <doTry id="_doTry3">
                                     <throttle id="_throttle2" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to_corebanking2" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;disconnect=true&amp;keepAlive=false"/>
+                                    <to id="_to_corebanking2" uri="netty:tcp://192.168.88.98:49810?disconnect=true&amp;keepAlive=false&amp;clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
                                     </throttle>
                                     <doCatch id="_AllError2">
                                     <!-- catch multiple exceptions -->
@@ -98,7 +98,7 @@
                                 <doTry id="_doTry4">
                                     <throttle id="_throttle3" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to_corebanking3" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;keepAlive=false&amp;disconnect=true"/>
+                                    <to id="_to_corebanking3" uri="netty:tcp://192.168.88.98:49810?disconnect=true&amp;keepAlive=false&amp;clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
                                     </throttle>
                                     <doCatch id="_AllError3">
                                     <!-- catch multiple exceptions -->
@@ -132,7 +132,7 @@
                                 <doTry id="_doTry3_AYOPINQ">
                                     <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to1__AYOPINQ" uri="http://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+                                    <to id="_to1__AYOPINQ" uri="http://fuse-integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     </throttle>
                                     <doCatch id="_AllError2_AYOPINQ">
                                     <!-- catch multiple exceptions -->
