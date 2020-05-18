@@ -124,7 +124,7 @@
                     </when>
                     <when id="_when5">
                         <simple>${body.substring(4,8)} == 'HOBI'</simple>
-                        <log id="_log2_AYOPINQ" message="Selected : RAPI"/>
+                        <log id="_log2_AYOPINQ" message="Selected : HOBI"/>
                         <choice id="_choice1_AYOPINQ">
                             <when id="_when1_AYOPINQ">
                                 <simple>${body} contains 'AYOPINQ'</simple>
