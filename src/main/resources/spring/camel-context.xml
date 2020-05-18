@@ -134,7 +134,7 @@
                                     <constant>2</constant>
                                     <to id="_to1__AYOPINQ" uri="http4://fuse-integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     </throttle>
-                                    <doCatch id="_AllError2_AYOPINQ">
+                                    <doCatch id="_AllErrors2_AYOPINQ">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
                                     <exception>java.lang.IllegalStateException</exception>
