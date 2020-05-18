@@ -26,7 +26,7 @@
     <!-- ================================== -->
     <camelContext id="multiple-netty-codecs-context"
         shutdownRoute="Default"
-        shutdownRunningTask="CompleteCurrentTaskOnly" xmlns="http://camel.apache.org/schema/spring">
+        shutdownRunningTask="CompleteCurrentTaskOnly" streamCache="true" xmlns="http://camel.apache.org/schema/spring">
         <route id="_HLI_TCP_Router">
             <from id="_to2" uri="netty:tcp://0.0.0.0:7000?requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
             <doTry id="_doTry1">
@@ -71,7 +71,7 @@
                                 <doTry id="_doTry3">
                                     <throttle id="_throttle2" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to_corebanking2" uri="netty:tcp://192.168.88.98:49810?disconnect=true&amp;keepAlive=false&amp;clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
+                                    <to id="_to_corebanking2" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;disconnect=true&amp;keepAlive=false"/>
                                     </throttle>
                                     <doCatch id="_AllError2">
                                     <!-- catch multiple exceptions -->
@@ -98,7 +98,7 @@
                                 <doTry id="_doTry4">
                                     <throttle id="_throttle3" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to_corebanking3" uri="netty:tcp://192.168.88.98:49810?disconnect=true&amp;keepAlive=false&amp;clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true"/>
+                                    <to id="_to_corebanking3" uri="netty:tcp://192.168.88.98:49810?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoder=#stringDecoder&amp;encoder=#stringEncoder&amp;textline=true&amp;keepAlive=false&amp;disconnect=true"/>
                                     </throttle>
                                     <doCatch id="_AllError3">
                                     <!-- catch multiple exceptions -->
@@ -124,10 +124,37 @@
                     </when>
                     <when id="_when5">
                         <simple>${body.substring(4,8)} == 'HOBI'</simple>
-                        <log id="_log2" message="Selected : RAPI"/>
-                        <setBody id="_setBody1">
-                            <simple>Error:UNDER MAINTENANCE :*</simple>
-                        </setBody>
+                        <log id="_log2_AYOPINQ" message="Selected : RAPI"/>
+                        <choice id="_choice1_AYOPINQ">
+                            <when id="_when1_AYOPINQ">
+                                <simple>${body} contains 'AYOPINQ'</simple>
+                                <log id="_log7_AYOPINQ" message="Selected : AYOPINQ / AYOPOP INQUIRY"/>
+                                <doTry id="_doTry3_AYOPINQ">
+                                    <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
+                                    <constant>2</constant>
+                                    <to id="_to1__AYOPINQ" uri="http://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+                                    </throttle>
+                                    <doCatch id="_AllError2_AYOPINQ">
+                                    <!-- catch multiple exceptions -->
+                                    <exception>java.io.IOException</exception>
+                                    <exception>java.lang.IllegalStateException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.net.ConnectException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                                    <setBody id="_setBody32_AYOPINQ">
+                                    <simple>Error:${exception.message}</simple>
+                                    </setBody>
+                                    <log id="_log42_AYOPINQ" message="TCP Router Response Body : ${body}"/>
+                                    </doCatch>
+                                </doTry>
+                            </when>
+                        </choice>
+                        <log id="_log9" message="Response Client :  ${body}"/>
                     </when>
                     <otherwise id="_otherwise1">
                         <log id="_log3" message="Selected : Unknown"/>
