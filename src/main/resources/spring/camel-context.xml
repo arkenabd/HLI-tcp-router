@@ -132,7 +132,7 @@
                                 <doTry id="_doTry3_AYOPINQ">
                                     <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to1__AYOPINQ" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id:32241/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true"/>
+                                    <to id="_to1__AYOPINQ" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true"/>
                                     <!-- <to id="_to1__AYOPINQ" uri="http4://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
                                     </throttle>
                                     <doCatch id="_AllErrors2_AYOPINQ">
