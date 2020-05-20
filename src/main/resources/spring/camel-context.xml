@@ -264,7 +264,6 @@
 			</doTry>
 		</route>
 	</camelContext>
-
 	<!-- ================================== -->
 	<!-- Define netty codecs -->
 	<!-- ================================== -->
@@ -272,6 +271,10 @@
 	<bean class="org.jboss.netty.handler.codec.string.StringDecoder"
 		id="stringDecoder" />
 	<!-- String to ChannelBuffer/ByteBuf -->
+	<bean class="io.netty.handler.codec.string.StringDecoder"
+		id="string-decoder" />
+	<bean class="io.netty.handler.codec.string.StringEncoder"
+		id="string-encoder" />
 	<bean class="org.jboss.netty.handler.codec.string.StringEncoder"
 		id="stringEncoder" />
 	<bean class="com.netty.fuse.GenerateFLDum" id="generateResultDum"
