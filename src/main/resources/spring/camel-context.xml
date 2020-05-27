@@ -161,7 +161,7 @@
                                 <doTry id="_doTry3_AYOPYMN">
                                     <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+                                    <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
 											/> -->
                                     </throttle>
