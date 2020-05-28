@@ -24,7 +24,7 @@
     <!-- ================================== -->
     <camelContext id="multiple-netty-codecs-context" streamCache="true" xmlns="http://camel.apache.org/schema/spring">
         <route id="_HLI_TCP_Router">
-            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
+            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?requestTimeout=5000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
             <process id="_Init_Strategy" ref="killRoute"/>
             <doTry id="_doTry1">
                 <log id="_showInput" message="Input HLI TCP Router : ${body}"/>
@@ -161,9 +161,8 @@
                                 <doTry id="_doTry3_AYOPYMN">
                                     <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
-                                    <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
-											/> -->
+                                    <!-- <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
+                                    <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     </throttle>
                                     <doCatch id="_AllErrors2_AYOPYMN">
                                     <!-- catch multiple exceptions -->
