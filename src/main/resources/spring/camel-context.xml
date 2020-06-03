@@ -129,6 +129,37 @@
 									</doCatch>
 								</doTry>
 							</when>
+							<when id="_when2_callback">
+								<simple>${body} contains 'AYOPYMN'</simple>
+								<log id="_log8_callback"
+									message="Selected : AYOPYMN / AYOPOP PAYMENT CALLBACK" />
+								<doTry id="_doTry4_callback">
+									<throttle id="_throttle3_callback"
+										timePeriodMillis="10000">
+										<constant>2</constant>
+										<to id="_to_corebanking3_callback" uri="direct:core" />
+									</throttle>
+									<doCatch id="_AllError3_callback">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody33_callback">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log43_callback"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
 						</choice>
 						<log id="_responseHli"
 							message="Response from core banking/ HOBIS:  ${body}" />
