@@ -168,12 +168,14 @@
                                     <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     </throttle>
                                     <log id="_log2" message="Response client ORI : ${body}"/>
+                                    <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
                                     <choice id="_choice1">
                                     <when id="_when6">
                                     <simple>${body} contains '504 Gateway Time-out'</simple>
                                     <setBody id="_setBody1">
                                     <simple>${exchangeProperty[bodyRequestOri]}</simple>
                                     </setBody>
+                                    <log id="_log9" message="Set Body To message error"/>
                                     <setBody id="_setBody4">
                                     <simple>0043RAPI${body.substring(8,41)}05</simple>
                                     </setBody>
