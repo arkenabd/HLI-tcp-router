@@ -164,20 +164,7 @@
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
                                     <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
                                     </throttle>
-                                    <log id="_log2" message="Response client ORI : ${body}"/>
-                                    <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
-                                    <choice id="_choice1">
-                                    <when id="_when6">
-                                    <simple>${body} contains '504 Gateway Time-out'</simple>
-                                    <setBody id="_setBody1">
-                                    <simple>${header.responseBody}</simple>
-                                    </setBody>
-                                    <log id="_log9" message="Get body from header.responseBody : ${header.responseBody}"/>
-                                    <setBody id="_setBody4">
-                                    <simple>0043RAPI${body.substring(8,41)}05</simple>
-                                    </setBody>
-                                    </when>
-                                    </choice>
+                                    <to id="_to1" uri="direct:handlerto"/>
                                     <doCatch id="_AllErrors2_AYOPYMN">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
@@ -302,6 +289,20 @@
 			<setBody id="_setBody_InitCon"> <simple>Error:${exception.message}</simple> 
 			</setBody> <log id="_log_InitCon" message="TCP Router Response Body : ${body}"/> 
 			</doCatch> </doTry> </route> -->
+        <route id="_handle_rto">
+            <from id="_to3" uri="direct:handlerto"/>
+            <log id="_log2" message="Response client ORI : ${body}"/>
+            <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
+            <choice id="_choice1">
+                <when id="_when6">
+                    <simple>${body} contains '504 Gateway Time-out'</simple>
+                    <setBody id="_setBody1">
+                        <simple>${header.responseBody}</simple>
+                    </setBody>
+                    <log id="_log9" message="Get body from header.responseBody : ${header.responseBody}"/>
+                </when>
+            </choice>
+        </route>
     </camelContext>
     <!-- ================================== -->
     <!-- Define netty codecs -->
