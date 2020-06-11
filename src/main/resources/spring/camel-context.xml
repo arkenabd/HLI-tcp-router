@@ -1,281 +1,344 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:beans="http://www.springframework.org/schema/beans"
-    xmlns:camel="http://camel.apache.org/schema/spring"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="     http://www.springframework.org/schema/beans      http://www.springframework.org/schema/beans/spring-beans.xsd      http://www.springframework.org/schema/context      http://www.springframework.org/schema/context/spring-context.xsd     http://camel.apache.org/schema/spring     http://camel.apache.org/schema/spring/camel-spring.xsd">
-    <!-- <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource" 
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="     http://www.springframework.org/schema/beans      http://www.springframework.org/schema/beans/spring-beans.xsd      http://www.springframework.org/schema/context      http://www.springframework.org/schema/context/spring-context.xsd     http://camel.apache.org/schema/spring     http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<!-- <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource" 
 		id="jdbc-oracle"> <property name="driverClass" value="${jdbc.oracle.driverClass}"/> 
 		<property name="url" value="${jdbc.oracle.url}"/> <property name="username" 
 		value="${jdbc.oracle.username}"/> <property name="password" value="${jdbc.oracle.password}"/> 
 		</bean> -->
-    <bean class="org.apache.camel.impl.DefaultShutdownStrategy" id="shutdown">
-        <property name="timeout" value="30"/>
-    </bean>
-    <bean class="java.util.Properties" id="myProperties"/>
-    <bean
-        class="org.apache.camel.component.properties.PropertiesComponent" id="properties">
-        <property name="cache" value="false"/>
-        <property name="location" value="classpath:application.properties"/>
-        <property name="overrideProperties" ref="myProperties"/>
-    </bean>
-    <!-- ================================== -->
-    <!-- Define camel context -->
-    <!-- ================================== -->
-    <camelContext id="multiple-netty-codecs-context" streamCache="true" xmlns="http://camel.apache.org/schema/spring">
-        <route id="_HLI_TCP_Router">
-            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?connectTimeout=60000&amp;requestTimeout=60000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
-            <process id="_Init_Strategy" ref="killRoute"/>
-            <doTry id="_doTry1">
-                <log id="_showInput" message="Input HLI TCP Router : ${body}"/>
-                <log id="_log6" message="Substring Switch Code : ${body.substring(4,8)}"/>
-                <choice id="_choice3">
-                    <description>${body} contains 'RAPI'</description>
-                    <when id="_when4">
-                        <simple>${body.substring(4,8)} == 'RAPI'</simple>
-                        <log id="_log5" message="Selected : RAPI"/>
-                        <choice id="_choice2">
-                            <when id="_when3">
-                                <simple>${body} contains 'IDMCSHO'</simple>
-                                <log id="_log1" message="Selected : IDMCSHO / CASHOUT"/>
-                                <doTry id="_doTry_callCore">
-                                    <throttle id="_throttle1" timePeriodMillis="10000">
-                                    <constant>100</constant>
-                                    <to id="_to_corebanking1" uri="direct:core"/>
-                                    </throttle>
-                                    <doCatch id="_AllError1">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody31">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log41" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                            <when id="_when1">
-                                <simple>${body} contains 'IDMREVS'</simple>
-                                <log id="_log7" message="Selected : IDMREVS / REVERSAL"/>
-                                <doTry id="_doTry3">
-                                    <throttle id="_throttle2" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to_corebanking2" uri="direct:core"/>
-                                    </throttle>
-                                    <doCatch id="_AllError2">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody32">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log42" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                            <when id="_when2">
-                                <simple>${body} contains 'IDMNOTF'</simple>
-                                <log id="_log8" message="Selected : IDMNOTF / NOTIFICATION"/>
-                                <doTry id="_doTry4">
-                                    <throttle id="_throttle3" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to_corebanking3" uri="direct:core"/>
-                                    </throttle>
-                                    <doCatch id="_AllError3">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody33">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log43" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                        </choice>
-                        <log id="_responseHli" message="Response from core banking/ HOBIS:  ${body}"/>
-                    </when>
-                    <when id="_when5">
-                        <simple>${body.substring(4,8)} == 'HOBI'</simple>
-                        <log id="_log2_PROC_CODE" message="Selected : HOBI"/>
-                        <choice id="_choice1_AYOPINQ">
-                            <when id="_when1_AYOPINQ">
-                                <simple>${body} contains 'AYOPINQ'</simple>
-                                <log id="_log7_AYOPINQ" message="Selected : AYOPINQ / AYOPOP INQUIRY"/>
-                                <doTry id="_doTry3_AYOPINQ">
-                                    <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to1__AYOPINQ" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
-                                    <!-- <to id="_to1__AYOPINQ" uri="http4://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
-                                    </throttle>
-                                    <doCatch id="_AllErrors2_AYOPINQ">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody32_AYOPINQ">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log42_AYOPINQ" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                            <when id="_when1_AYOPYMN">
-                                <simple>${body} contains 'AYOPYMN'</simple>
-                                <log id="_log7_AYOPYMN" message="Selected : AYOPYMN / AYOPOP PAYMENT"/>
-                                <doTry id="_doTry3_AYOPYMN">
-                                    <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
-                                    <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
-                                    </throttle>
-                                    <to id="_to1" uri="direct:handlerto"/>
-                                    <doCatch id="_AllErrors2_AYOPYMN">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody32_AYOPYMN">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log42_AYOPYMN" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                            <when id="_when1_AYOPSTA">
-                                <simple>${body} contains 'AYOPSTS'</simple>
-                                <log id="_log7_AYOPSTA" message="Selected : AYOPSTA / AYOPOP STATUS"/>
-                                <doTry id="_doTry3_AYOPSTA">
-                                    <throttle id="_throttle2_AYOPSTA" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to1__AYOPSTA" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
-                                    <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
+	<bean class="org.apache.camel.impl.DefaultShutdownStrategy"
+		id="shutdown">
+		<property name="timeout" value="30" />
+	</bean>
+	<bean class="java.util.Properties" id="myProperties" />
+	<bean
+		class="org.apache.camel.component.properties.PropertiesComponent"
+		id="properties">
+		<property name="cache" value="false" />
+		<property name="location"
+			value="classpath:application.properties" />
+		<property name="overrideProperties" ref="myProperties" />
+	</bean>
+	<!-- ================================== -->
+	<!-- Define camel context -->
+	<!-- ================================== -->
+	<camelContext id="multiple-netty-codecs-context"
+		streamCache="true" xmlns="http://camel.apache.org/schema/spring">
+		<route id="_HLI_TCP_Router">
+			<from id="_toCore"
+				uri="netty4:tcp://0.0.0.0:7000?connectTimeout=60000&amp;requestTimeout=60000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" />
+			<process id="_Init_Strategy" ref="killRoute" />
+			<doTry id="_doTry1">
+				<log id="_showInput" message="Input HLI TCP Router : ${body}" />
+				<log id="_log6"
+					message="Substring Switch Code : ${body.substring(4,8)}" />
+				<choice id="_choice3">
+					<description>${body} contains 'RAPI'</description>
+					<when id="_when4">
+						<simple>${body.substring(4,8)} == 'RAPI'</simple>
+						<log id="_log5" message="Selected : RAPI" />
+						<choice id="_choice2">
+							<when id="_when3">
+								<simple>${body} contains 'IDMCSHO'</simple>
+								<log id="_log1" message="Selected : IDMCSHO / CASHOUT" />
+								<doTry id="_doTry_callCore">
+									<throttle id="_throttle1" timePeriodMillis="10000">
+										<constant>100</constant>
+										<to id="_to_corebanking1" uri="direct:core" />
+									</throttle>
+									<doCatch id="_AllError1">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody31">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log41"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+							<when id="_when1">
+								<simple>${body} contains 'IDMREVS'</simple>
+								<log id="_log7" message="Selected : IDMREVS / REVERSAL" />
+								<doTry id="_doTry3">
+									<throttle id="_throttle2" timePeriodMillis="10000">
+										<constant>2</constant>
+										<to id="_to_corebanking2" uri="direct:core" />
+									</throttle>
+									<doCatch id="_AllError2">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody32">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log42"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+							<when id="_when2">
+								<simple>${body} contains 'IDMNOTF'</simple>
+								<log id="_log8" message="Selected : IDMNOTF / NOTIFICATION" />
+								<doTry id="_doTry4">
+									<throttle id="_throttle3" timePeriodMillis="10000">
+										<constant>2</constant>
+										<to id="_to_corebanking3" uri="direct:core" />
+									</throttle>
+									<doCatch id="_AllError3">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody33">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log43"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+						</choice>
+						<log id="_responseHli"
+							message="Response from core banking/ HOBIS:  ${body}" />
+					</when>
+					<when id="_when5">
+						<simple>${body.substring(4,8)} == 'HOBI'</simple>
+						<log id="_log2_PROC_CODE" message="Selected : HOBI" />
+						<choice id="_choice1_AYOPINQ">
+							<when id="_when1_AYOPINQ">
+								<simple>${body} contains 'AYOPINQ'</simple>
+								<log id="_log7_AYOPINQ"
+									message="Selected : AYOPINQ / AYOPOP INQUIRY" />
+								<doTry id="_doTry3_AYOPINQ">
+									<throttle id="_throttle2_AYOPINQ"
+										timePeriodMillis="10000">
+										<constant>2</constant>
+										<to id="_to1__AYOPINQ"
+											uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" />
+										<!-- <to id="_to1__AYOPINQ" uri="http4://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
+									</throttle>
+									<log id="_log2_inq" message="Response client ORI : ${body}" />
+									<convertBodyTo id="_convertBodyTo1_inq"
+										type="java.lang.String" />
+									<choice id="_choice1_inq">
+										<when id="_when6_inq">
+											<simple>${body} contains '504 Gateway Time-out'</simple>
+											<setBody id="_setBody1_inq">
+												<simple>${header.responseBody}</simple>
+											</setBody>
+											<log id="_log9__inq"
+												message="Get body from header.responseBody : ${header.responseBody}" />
+										</when>
+									</choice>
+									<doCatch id="_AllErrors2_AYOPINQ">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody32_AYOPINQ">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log42_AYOPINQ"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+							<when id="_when1_AYOPYMN">
+								<simple>${body} contains 'AYOPYMN'</simple>
+								<log id="_log7_AYOPYMN"
+									message="Selected : AYOPYMN / AYOPOP PAYMENT" />
+								<doTry id="_doTry3_AYOPYMN">
+									<throttle id="_throttle2_AYOPYMN"
+										timePeriodMillis="10000">
+										<constant>2</constant>
+										<!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
+										<to id="_to1__AYOPYMN"
+											uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" />
+									</throttle>
+									<log id="_log2" message="Response client ORI : ${body}" />
+									<convertBodyTo id="_convertBodyTo1"
+										type="java.lang.String" />
+									<choice id="_choice1">
+										<when id="_when6">
+											<simple>${body} contains '504 Gateway Time-out'</simple>
+											<setBody id="_setBody1">
+												<simple>${header.responseBody}</simple>
+											</setBody>
+											<log id="_log9"
+												message="Get body from header.responseBody : ${header.responseBody}" />
+										</when>
+									</choice>
+									<doCatch id="_AllErrors2_AYOPYMN">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody32_AYOPYMN">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log42_AYOPYMN"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+							<when id="_when1_AYOPSTA">
+								<simple>${body} contains 'AYOPSTS'</simple>
+								<log id="_log7_AYOPSTA"
+									message="Selected : AYOPSTA / AYOPOP STATUS" />
+								<doTry id="_doTry3_AYOPSTA">
+									<throttle id="_throttle2_AYOPSTA"
+										timePeriodMillis="10000">
+										<constant>2</constant>
+										<to id="_to1__AYOPSTA"
+											uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" />
+										<!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
 											/> -->
-                                    </throttle>
-                                    <doCatch id="_AllErrors2_AYOPSTA">
-                                    <!-- catch multiple exceptions -->
-                                    <exception>java.io.IOException</exception>
-                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>java.lang.IllegalStateException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                                    <exception>org.apache.camel.CamelExchangeException</exception>
-                                    <exception>java.net.ConnectException</exception>
-                                    <exception>java.lang.IllegalArgumentException</exception>
-                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody32_AYOPSTA">
-                                    <simple>Error:${exception.message}</simple>
-                                    </setBody>
-                                    <log id="_log42_AYOPSTA" message="TCP Router Response Body : ${body}"/>
-                                    </doCatch>
-                                </doTry>
-                            </when>
-                        </choice>
-                        <log id="_Response" message="Response Client Final:  ${body}"/>
-                    </when>
-                    <otherwise id="_otherwise1">
-                        <log id="_log3" message="Selected : Unknown"/>
-                        <setBody id="_setBody2">
-                            <simple>Error:The transaction cannot be executed because the
+									</throttle>
+									<log id="_log2_sta" message="Response client ORI : ${body}" />
+									<convertBodyTo id="_convertBodyTo1_sta"
+										type="java.lang.String" />
+									<choice id="_choice1_sta">
+										<when id="_when6_sta">
+											<simple>${body} contains '504 Gateway Time-out'</simple>
+											<setBody id="_setBody1_sta">
+												<simple>${header.responseBody}</simple>
+											</setBody>
+											<log id="_log9_sta"
+												message="Get body from header.responseBody : ${header.responseBody}" />
+										</when>
+									</choice>
+									<doCatch id="_AllErrors2_AYOPSTA">
+										<!-- catch multiple exceptions -->
+										<exception>java.io.IOException</exception>
+										<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>java.lang.IllegalStateException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+										<exception>org.apache.camel.CamelExchangeException</exception>
+										<exception>java.net.ConnectException</exception>
+										<exception>java.lang.IllegalArgumentException</exception>
+										<exception>org.apache.camel.ExpressionEvaluationException</exception>
+										<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+										<setBody id="_setBody32_AYOPSTA">
+											<simple>Error:${exception.message}</simple>
+										</setBody>
+										<log id="_log42_AYOPSTA"
+											message="TCP Router Response Body : ${body}" />
+									</doCatch>
+								</doTry>
+							</when>
+						</choice>
+						<log id="_Response" message="Response Client Final:  ${body}" />
+					</when>
+					<otherwise id="_otherwise1">
+						<log id="_log3" message="Selected : Unknown" />
+						<setBody id="_setBody2">
+							<simple>Error:The transaction cannot be executed because the
 								SWITCH CODE is not recognized</simple>
-                        </setBody>
-                    </otherwise>
-                </choice>
-                <doCatch id="_AllError">
-                    <!-- catch multiple exceptions -->
-                    <exception>java.io.IOException</exception>
-                    <exception>java.lang.IllegalStateException</exception>
-                    <exception>org.apache.camel.CamelExchangeException</exception>
-                    <exception>java.lang.IllegalArgumentException</exception>
-                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                    <exception>org.apache.camel.CamelExchangeException</exception>
-                    <exception>java.net.ConnectException</exception>
-                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                    <exception>java.lang.IllegalArgumentException</exception>
-                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                    <setBody id="_setBody3">
-                        <simple>Error:${exception.message}</simple>
-                    </setBody>
-                    <log id="_log4" message="TCP Router Response Body : ${body}"/>
-                </doCatch>
-            </doTry>
-            <!-- <to id="to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
-            <!-- <log id="_log2" message="${body}"/> -->
-        </route>
-        <route id="_corebank">
-            <from id="_from1" uri="direct:core"/>
-            <doTry id="_doTry2">
-                <!-- <to id="_to2" uri="netty4:tcp://localhost:1234?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/> -->
-                <to id="_to2" uri="netty4:tcp://192.168.88.98:49810?disconnect=true&amp;clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
-                <!-- <to id="_to2" uri="netty4:tcp://localhost:7001?clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" 
+						</setBody>
+					</otherwise>
+				</choice>
+				<doCatch id="_AllError">
+					<!-- catch multiple exceptions -->
+					<exception>java.io.IOException</exception>
+					<exception>java.lang.IllegalStateException</exception>
+					<exception>org.apache.camel.CamelExchangeException</exception>
+					<exception>java.lang.IllegalArgumentException</exception>
+					<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+					<exception>org.apache.camel.CamelExchangeException</exception>
+					<exception>java.net.ConnectException</exception>
+					<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+					<exception>java.lang.IllegalArgumentException</exception>
+					<exception>org.apache.camel.ExpressionEvaluationException</exception>
+					<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+					<setBody id="_setBody3">
+						<simple>Error:${exception.message}</simple>
+					</setBody>
+					<log id="_log4" message="TCP Router Response Body : ${body}" />
+				</doCatch>
+			</doTry>
+			<!-- <to id="to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
+			<!-- <log id="_log2" message="${body}"/> -->
+		</route>
+		<route id="_corebank">
+			<from id="_from1" uri="direct:core" />
+			<doTry id="_doTry2">
+				<!-- <to id="_to2" uri="netty4:tcp://localhost:1234?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/> -->
+				<to id="_to2"
+					uri="netty4:tcp://192.168.88.98:49810?disconnect=true&amp;clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" />
+				<!-- <to id="_to2" uri="netty4:tcp://localhost:7001?clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" 
 					/> -->
-                <doCatch id="_AllError_callCore">
-                    <!-- catch multiple exceptions -->
-                    <exception>java.io.IOException</exception>
-                    <exception>java.lang.IllegalStateException</exception>
-                    <exception>org.apache.camel.CamelExchangeException</exception>
-                    <exception>java.lang.IllegalArgumentException</exception>
-                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
-                    <exception>org.apache.camel.CamelExchangeException</exception>
-                    <exception>java.net.ConnectException</exception>
-                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
-                    <exception>java.lang.IllegalArgumentException</exception>
-                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
-                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                    <setBody id="_setBody3_callCore">
-                        <simple>Error:${exception.message}</simple>
-                    </setBody>
-                    <log id="_log4_callCore" message="TCP Router Response Body : ${body}"/>
-                </doCatch>
-            </doTry>
-        </route>
-        <!-- <route id="_Initialize_Con"> <from id="_from2" uri="timer://foo?repeatCount=1"/> 
+				<doCatch id="_AllError_callCore">
+					<!-- catch multiple exceptions -->
+					<exception>java.io.IOException</exception>
+					<exception>java.lang.IllegalStateException</exception>
+					<exception>org.apache.camel.CamelExchangeException</exception>
+					<exception>java.lang.IllegalArgumentException</exception>
+					<exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+					<exception>org.apache.camel.CamelExchangeException</exception>
+					<exception>java.net.ConnectException</exception>
+					<exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+					<exception>java.lang.IllegalArgumentException</exception>
+					<exception>org.apache.camel.ExpressionEvaluationException</exception>
+					<exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+					<setBody id="_setBody3_callCore">
+						<simple>Error:${exception.message}</simple>
+					</setBody>
+					<log id="_log4_callCore"
+						message="TCP Router Response Body : ${body}" />
+				</doCatch>
+			</doTry>
+		</route>
+		<!-- <route id="_Initialize_Con"> <from id="_from2" uri="timer://foo?repeatCount=1"/> 
 			<doTry id="_doTry5"> <log id="_log2" message="Initialize TCP Connection to 
 			Core"/> <setBody id="_setBody1"> <simple>0025INITIALIZE CONNECTION</simple> 
 			</setBody> <to id="_to1" uri="direct:core"/> <log id="_log10" message="Response 
@@ -289,31 +352,24 @@
 			<setBody id="_setBody_InitCon"> <simple>Error:${exception.message}</simple> 
 			</setBody> <log id="_log_InitCon" message="TCP Router Response Body : ${body}"/> 
 			</doCatch> </doTry> </route> -->
-        <route id="_handle_rto">
-            <from id="_to3" uri="direct:handlerto"/>
-            <log id="_log2" message="Response client ORI : ${body}"/>
-            <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
-            <choice id="_choice1">
-                <when id="_when6">
-                    <simple>${body} contains '504 Gateway Time-out'</simple>
-                    <setBody id="_setBody1">
-                        <simple>${header.responseBody}</simple>
-                    </setBody>
-                    <log id="_log9" message="Get body from header.responseBody : ${header.responseBody}"/>
-                </when>
-            </choice>
-        </route>
-    </camelContext>
-    <!-- ================================== -->
-    <!-- Define netty codecs -->
-    <!-- ================================== -->
-    <!-- ChannelBuffer/ByteBuf to String -->
-    <bean class="org.jboss.netty.handler.codec.string.StringDecoder" id="stringDecoder"/>
-    <!-- String to ChannelBuffer/ByteBuf -->
-    <bean class="io.netty.handler.codec.string.StringDecoder" id="string-decoder"/>
-    <bean class="io.netty.handler.codec.string.StringEncoder" id="string-encoder"/>
-    <bean class="org.jboss.netty.handler.codec.string.StringEncoder" id="stringEncoder"/>
-    <bean class="com.netty.fuse.GenerateFLDum" id="generateResultDum" scope="singleton"/>
-    <bean class="com.netty.fuse.GenerateCounter" id="generateCounter" scope="singleton"/>
-    <bean class="com.netty.fuse.KillRoute" id="killRoute" scope="singleton"/>
+	</camelContext>
+	<!-- ================================== -->
+	<!-- Define netty codecs -->
+	<!-- ================================== -->
+	<!-- ChannelBuffer/ByteBuf to String -->
+	<bean class="org.jboss.netty.handler.codec.string.StringDecoder"
+		id="stringDecoder" />
+	<!-- String to ChannelBuffer/ByteBuf -->
+	<bean class="io.netty.handler.codec.string.StringDecoder"
+		id="string-decoder" />
+	<bean class="io.netty.handler.codec.string.StringEncoder"
+		id="string-encoder" />
+	<bean class="org.jboss.netty.handler.codec.string.StringEncoder"
+		id="stringEncoder" />
+	<bean class="com.netty.fuse.GenerateFLDum" id="generateResultDum"
+		scope="singleton" />
+	<bean class="com.netty.fuse.GenerateCounter" id="generateCounter"
+		scope="singleton" />
+	<bean class="com.netty.fuse.KillRoute" id="killRoute"
+		scope="singleton" />
 </beans>
