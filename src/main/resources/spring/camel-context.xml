@@ -24,7 +24,7 @@
     <!-- ================================== -->
     <camelContext id="multiple-netty-codecs-context" streamCache="true" xmlns="http://camel.apache.org/schema/spring">
         <route id="_HLI_TCP_Router">
-            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?connectTimeout=60000&amp;requestTimeout=60000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true&amp;disconnectOnNoReply=false&amp;exchangePattern=InOnly"/>
+            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?sync=false&amp;disconnectOnNoReply=false&amp;exchangePattern=InOnly&amp;connectTimeout=60000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
             <process id="_Init_Strategy" ref="killRoute"/>
             <doTry id="_doTry1">
                 <log id="_showInput" message="Input HLI TCP Router : ${body}"/>
