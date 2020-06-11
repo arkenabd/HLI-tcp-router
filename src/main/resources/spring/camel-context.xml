@@ -158,9 +158,6 @@
                             <when id="_when1_AYOPYMN">
                                 <simple>${body} contains 'AYOPYMN'</simple>
                                 <log id="_log7_AYOPYMN" message="Selected : AYOPYMN / AYOPOP PAYMENT"/>
-                                <setProperty id="_setProperty1" propertyName="bodyRequestOri">
-                                    <simple>${body}</simple>
-                                </setProperty>
                                 <doTry id="_doTry3_AYOPYMN">
                                     <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
                                     <constant>2</constant>
@@ -173,9 +170,9 @@
                                     <when id="_when6">
                                     <simple>${body} contains '504 Gateway Time-out'</simple>
                                     <setBody id="_setBody1">
-                                    <simple>${exchangeProperty[bodyRequestOri]}</simple>
+                                    <simple>${header.responseBody}</simple>
                                     </setBody>
-                                    <log id="_log9" message="Set Body To message error"/>
+                                    <log id="_log9" message="Get body from header.responseBody : ${header.responseBody}"/>
                                     <setBody id="_setBody4">
                                     <simple>0043RAPI${body.substring(8,41)}05</simple>
                                     </setBody>
