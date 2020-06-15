@@ -24,26 +24,26 @@
     <!-- ================================== -->
     <camelContext id="multiple-netty-codecs-context" streamCache="true" xmlns="http://camel.apache.org/schema/spring">
         <route id="_HLI_TCP_Router">
-            <from id="_toCore" uri="netty4:tcp://0.0.0.0:7000?sync=false&amp;disconnectOnNoReply=false&amp;connectTimeout=60000&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
+            <from id="_toCore" uri="netty4:tcp://0.0.0.0:49810?sync=false&amp;disconnectOnNoReply=false&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
             <process id="_Init_Strategy" ref="killRoute"/>
             <doTry id="_doTry1">
                 <log id="_showInput" message="Input HLI TCP Router : ${body}"/>
                 <log id="_log6" message="Substring Switch Code : ${body.substring(4,8)}"/>
                 <choice id="_choice3">
                     <description>${body} contains 'RAPI'</description>
-                    <when id="_when4">
+                    <when id="_when9">
                         <simple>${body.substring(4,8)} == 'RAPI'</simple>
                         <log id="_log5" message="Selected : RAPI"/>
                         <choice id="_choice2">
-                            <when id="_when3">
-                                <simple>${body} contains 'IDMCSHO'</simple>
-                                <log id="_log1" message="Selected : IDMCSHO / CASHOUT"/>
-                                <doTry id="_doTry_callCore">
-                                    <throttle id="_throttle1" timePeriodMillis="10000">
+                            <when id="_when10">
+                                <simple>${body} contains 'AYOPINQ'</simple>
+                                <log id="_log1_ayopinq" message="Selected : AYOPINQ / INQUIRY"/>
+                                <doTry id="_doTry_callCore_ayopinq">
+                                    <throttle id="_throttle1_ayopinq" timePeriodMillis="10000">
                                     <constant>100</constant>
-                                    <to id="_to_corebanking1" uri="direct:core"/>
+                                    <to id="_to4" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <doCatch id="_AllError1">
+                                    <doCatch id="_AllError1_ayopinq">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
                                     <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
@@ -56,22 +56,23 @@
                                     <exception>java.lang.IllegalArgumentException</exception>
                                     <exception>org.apache.camel.ExpressionEvaluationException</exception>
                                     <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody31">
+                                    <setBody id="_setBody31_inq">
                                     <simple>Error:${exception.message}</simple>
                                     </setBody>
-                                    <log id="_log41" message="TCP Router Response Body : ${body}"/>
+                                    <log id="_log41_ayopinq" message="TCP Router Response Body : ${body}"/>
                                     </doCatch>
                                 </doTry>
                             </when>
-                            <when id="_when1">
-                                <simple>${body} contains 'IDMREVS'</simple>
-                                <log id="_log7" message="Selected : IDMREVS / REVERSAL"/>
-                                <doTry id="_doTry3">
-                                    <throttle id="_throttle2" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to_corebanking2" uri="direct:core"/>
+                            <when id="_when8">
+                                <simple>${body} contains 'AYOPSTS'</simple>
+                                <log id="_log1_ayopsts" message="Selected : AYOPSTS / STATUS"/>
+                                <doTry id="_doTry_callCore_ayopsts">
+                                    <throttle id="_throttle1_ayopsts" timePeriodMillis="10000">
+                                    <constant>100</constant>
+                                    <to
+                                    id="_to_corebanking1_ayopsts" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <doCatch id="_AllError2">
+                                    <doCatch id="_AllError1_ayopsts">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
                                     <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
@@ -84,22 +85,23 @@
                                     <exception>java.lang.IllegalArgumentException</exception>
                                     <exception>org.apache.camel.ExpressionEvaluationException</exception>
                                     <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody32">
+                                    <setBody id="_setBody31_sts">
                                     <simple>Error:${exception.message}</simple>
                                     </setBody>
-                                    <log id="_log42" message="TCP Router Response Body : ${body}"/>
+                                    <log id="_log41_ayopsts" message="TCP Router Response Body : ${body}"/>
                                     </doCatch>
                                 </doTry>
                             </when>
-                            <when id="_when2">
-                                <simple>${body} contains 'IDMNOTF'</simple>
-                                <log id="_log8" message="Selected : IDMNOTF / NOTIFICATION"/>
-                                <doTry id="_doTry4">
-                                    <throttle id="_throttle3" timePeriodMillis="10000">
-                                    <constant>2</constant>
-                                    <to id="_to_corebanking3" uri="direct:core"/>
+                            <when id="_when4">
+                                <simple>${body} contains 'AYOPYMN'</simple>
+                                <log id="_log1_ayopymn" message="Selected : AYOPYMN / PAYMENT"/>
+                                <doTry id="_doTry_callCore_ayopymn">
+                                    <throttle id="_throttle1_ayopymn" timePeriodMillis="10000">
+                                    <constant>100</constant>
+                                    <to
+                                    id="_to_corebanking1_ayopymn" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <doCatch id="_AllError3">
+                                    <doCatch id="_AllError1_ayopymn">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
                                     <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
@@ -112,15 +114,14 @@
                                     <exception>java.lang.IllegalArgumentException</exception>
                                     <exception>org.apache.camel.ExpressionEvaluationException</exception>
                                     <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                                    <setBody id="_setBody33">
+                                    <setBody id="_setBody31_pay">
                                     <simple>Error:${exception.message}</simple>
                                     </setBody>
-                                    <log id="_log43" message="TCP Router Response Body : ${body}"/>
+                                    <log id="_log41_ayopymn" message="TCP Router Response Body : ${body}"/>
                                     </doCatch>
                                 </doTry>
                             </when>
                         </choice>
-                        <log id="_responseHli" message="Response from core banking/ HOBIS:  ${body}"/>
                     </when>
                     <when id="_when5">
                         <simple>${body.substring(4,8)} == 'HOBI'</simple>
@@ -133,21 +134,11 @@
                                     <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
                                     <constant>2</constant>
                                     <!-- <to id="_to1__AYOPINQ" uri="http4://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
-                                    <inOnly id="_inOnly3" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry"/>
+                                    <!-- <inOnly id="_inOnly3" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry"/> -->
                                     <!-- <to id="_to1__AYOPINQ" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
+                                    <to id="inquiryAsync"
+                                    pattern="InOnly" uri="seda:inquiry?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <log id="_log2_inq" message="Response client ORI : ${body}"/>
-                                    <convertBodyTo
-                                    id="_convertBodyTo1_inq" type="java.lang.String"/>
-                                    <choice id="_choice1_inq">
-                                    <when id="_when6_inq">
-                                    <simple>${body} contains '504 Gateway Time-out'</simple>
-                                    <setBody id="_setBody1_inq">
-                                    <simple>${header.responseBody}</simple>
-                                    </setBody>
-                                    <log id="_log9__inq" message="Get body from header.responseBody : ${header.responseBody}"/>
-                                    </when>
-                                    </choice>
                                     <doCatch id="_AllErrors2_AYOPINQ">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
@@ -174,22 +165,13 @@
                                 <doTry id="_doTry3_AYOPYMN">
                                     <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <inOnly id="_inOnly1" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment"/>
+                                    <!-- <inOnly id="_inOnly1" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment" 
+											/> -->
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
 											/> -->
+                                    <to id="_to10" uri="seda:payment?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <log id="_log2" message="Response client ORI : ${body}"/>
-                                    <convertBodyTo id="_convertBodyTo1" type="java.lang.String"/>
-                                    <choice id="_choice1">
-                                    <when id="_when6">
-                                    <simple>${body} contains '504 Gateway Time-out'</simple>
-                                    <setBody id="_setBody1">
-                                    <simple>${header.responseBody}</simple>
-                                    </setBody>
-                                    <log id="_log9" message="Get body from header.responseBody : ${header.responseBody}"/>
-                                    </when>
-                                    </choice>
                                     <doCatch id="_AllErrors2_AYOPYMN">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
@@ -216,23 +198,13 @@
                                 <doTry id="_doTry3_AYOPSTA">
                                     <throttle id="_throttle2_AYOPSTA" timePeriodMillis="10000">
                                     <constant>2</constant>
-                                    <inOnly id="_inOnly2" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status"/>
+                                    <!-- <inOnly id="_inOnly2" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status" 
+											/> -->
                                     <!-- <to id="_to1__AYOPSTA" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false" 
 											/> -->
+                                    <to id="_to11" uri="seda:status?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
-                                    <log id="_log2_sta" message="Response client ORI : ${body}"/>
-                                    <convertBodyTo
-                                    id="_convertBodyTo1_sta" type="java.lang.String"/>
-                                    <choice id="_choice1_sta">
-                                    <when id="_when6_sta">
-                                    <simple>${body} contains '504 Gateway Time-out'</simple>
-                                    <setBody id="_setBody1_sta">
-                                    <simple>${header.responseBody}</simple>
-                                    </setBody>
-                                    <log id="_log9_sta" message="Get body from header.responseBody : ${header.responseBody}"/>
-                                    </when>
-                                    </choice>
                                     <doCatch id="_AllErrors2_AYOPSTA">
                                     <!-- catch multiple exceptions -->
                                     <exception>java.io.IOException</exception>
@@ -254,14 +226,12 @@
                                 </doTry>
                             </when>
                         </choice>
-                        <log id="_Response" message="Response Client Final:  ${body}"/>
+                        <log id="_log10" message="Send to Mock Result"/>
+                        <to id="_to5" uri="mock:result"/>
                     </when>
                     <otherwise id="_otherwise1">
                         <log id="_log3" message="Selected : Unknown"/>
-                        <setBody id="_setBody2">
-                            <simple>Error:The transaction cannot be executed because the
-								SWITCH CODE is not recognized</simple>
-                        </setBody>
+                        <to id="_to12" uri="mock:result"/>
                     </otherwise>
                 </choice>
                 <doCatch id="_AllError">
@@ -286,13 +256,142 @@
             <!-- <to id="to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
             <!-- <log id="_log2" message="${body}"/> -->
         </route>
+        <route id="2_HLI_TCP_Router">
+            <from id="2_toCore" uri="netty4:tcp://0.0.0.0:49811?disconnectOnNoReply=false&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;textline=true&amp;decoders=#string-decoder&amp;encoders=#string-encoder"/>
+            <process id="2_Init_Strategy" ref="killRoute"/>
+            <doTry id="2_doTry1">
+                <log id="2_showInput" message="Input HLI TCP Router : ${body}"/>
+                <log id="2_log6" message="Substring Switch Code : ${body.substring(4,8)}"/>
+                <choice id="2_choice3">
+                    <description>${body} contains 'RAPI'</description>
+                    <when id="2_when9">
+                        <simple>${body.substring(4,8)} == 'RAPI'</simple>
+                        <log id="2_log5" message="Selected : RAPI"/>
+                        <choice id="2_choice2">
+                            <when id="2_when3">
+                                <simple>${body} contains 'IDMCSHO'</simple>
+                                <log id="2_log1" message="Selected : IDMCSHO / CASHOUT"/>
+                                <doTry id="2_doTry_callCore">
+                                    <throttle id="2_throttle1" timePeriodMillis="10000">
+                                    <constant>100</constant>
+                                    <to id="2_to1" uri="direct:core"/>
+                                    </throttle>
+                                    <log id="2_responseHli" message="Response from core banking/ HOBIS:  ${body}"/>
+                                    <doCatch id="2_AllError1">
+                                    <!-- catch multiple exceptions -->
+                                    <exception>java.io.IOException</exception>
+                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>java.lang.IllegalStateException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.net.ConnectException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                                    <setBody id="2_setBody31">
+                                    <simple>Error:${exception.message}</simple>
+                                    </setBody>
+                                    <log id="2_log41" message="TCP Router Response Body : ${body}"/>
+                                    </doCatch>
+                                </doTry>
+                            </when>
+                            <when id="2_when1">
+                                <simple>${body} contains 'IDMREVS'</simple>
+                                <log id="2_log7" message="Selected : IDMREVS / REVERSAL"/>
+                                <doTry id="2_doTry3">
+                                    <throttle id="2_throttle2" timePeriodMillis="10000">
+                                    <constant>2</constant>
+                                    <to id="2_to_corebanking2" uri="direct:core"/>
+                                    </throttle>
+                                    <log id="2_responseHli2" message="Response from core banking/ HOBIS:  ${body}"/>
+                                    <doCatch id="2_AllError2">
+                                    <!-- catch multiple exceptions -->
+                                    <exception>java.io.IOException</exception>
+                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>java.lang.IllegalStateException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.net.ConnectException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                                    <setBody id="2_setBody32">
+                                    <simple>Error:${exception.message}</simple>
+                                    </setBody>
+                                    <log id="2_log42" message="TCP Router Response Body : ${body}"/>
+                                    </doCatch>
+                                </doTry>
+                            </when>
+                            <when id="2_when2">
+                                <simple>${body} contains 'IDMNOTF'</simple>
+                                <log id="2_log8" message="Selected : IDMNOTF / NOTIFICATION"/>
+                                <doTry id="2_doTry4">
+                                    <throttle id="2_throttle3" timePeriodMillis="10000">
+                                    <constant>2</constant>
+                                    <to id="2_to_corebanking3" uri="direct:core"/>
+                                    </throttle>
+                                    <log id="2_responseHli3" message="Response from core banking/ HOBIS:  ${body}"/>
+                                    <doCatch id="2_AllError3">
+                                    <!-- catch multiple exceptions -->
+                                    <exception>java.io.IOException</exception>
+                                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>java.lang.IllegalStateException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                                    <exception>org.apache.camel.CamelExchangeException</exception>
+                                    <exception>java.net.ConnectException</exception>
+                                    <exception>java.lang.IllegalArgumentException</exception>
+                                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                                    <setBody id="2_setBody33">
+                                    <simple>Error:${exception.message}</simple>
+                                    </setBody>
+                                    <log id="2_log43" message="TCP Router Response Body : ${body}"/>
+                                    </doCatch>
+                                </doTry>
+                            </when>
+                        </choice>
+                    </when>
+                    <otherwise id="2_otherwise1">
+                        <log id="2_log3" message="Selected : Unknown"/>
+                        <to id="2_to12" uri="mock:result"/>
+                    </otherwise>
+                </choice>
+                <doCatch id="2_AllError">
+                    <!-- catch multiple exceptions -->
+                    <exception>java.io.IOException</exception>
+                    <exception>java.lang.IllegalStateException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.net.ConnectException</exception>
+                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                    <setBody id="2_setBody3">
+                        <simple>Error:${exception.message}</simple>
+                    </setBody>
+                    <log id="2_log4" message="TCP Router Response Body : ${body}"/>
+                </doCatch>
+            </doTry>
+            <!-- <to id="2to_1" uri="flatpack:fixed:flconfig.xml?ignoreFirstRecord=false&amp;splitRows=false"/> -->
+            <!-- <log id="2_log2" message="${body}"/> -->
+        </route>
         <route id="_corebank">
             <from id="_from1" uri="direct:core"/>
             <doTry id="_doTry2">
-                <!-- <to id="_to2" uri="netty4:tcp://localhost:1234?clientMode=true&amp;requestTimeout=10000&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/> -->
-                <to id="_to2" uri="netty4:tcp://192.168.88.98:49810?disconnect=true&amp;clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
+                <!-- <to id="_to2" uri="netty4:tcp://192.168.88.98:49810?disconnect=true&amp;clientMode=true&amp;synchronous=true&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/> -->
                 <!-- <to id="_to2" uri="netty4:tcp://localhost:7001?clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" 
 					/> -->
+                <bean id="_bean1" ref="cleansing"/>
+                <to id="_to1" uri="netty4:tcp://{{corebank.address}}:{{corebank.port}}?clientMode=true&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
                 <doCatch id="_AllError_callCore">
                     <!-- catch multiple exceptions -->
                     <exception>java.io.IOException</exception>
@@ -313,6 +412,34 @@
                 </doCatch>
             </doTry>
         </route>
+        <route id="_corebankInOnly">
+            <from id="_from1InOnly" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
+            <doTry id="_doTry2InOnly">
+                <bean id="_bean2" ref="cleansing"/>
+                <to id="_inOnlyCore" uri="netty4:tcp://{{corebank.address}}:{{corebank.port}}?sync=false&amp;clientMode=true&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
+                <!-- <inOnly id="_inOnlyCore" uri="netty4:tcp://192.168.88.98:49810?disconnect=true&amp;clientMode=true&amp;synchronous=true&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/> -->
+                <!-- <to id="_to2" uri="netty4:tcp://localhost:7001?clientMode=true&amp;allowDefaultCodec=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true" 
+					/> -->
+                <doCatch id="_AllError_callCoreInOnly">
+                    <!-- catch multiple exceptions -->
+                    <exception>java.io.IOException</exception>
+                    <exception>java.lang.IllegalStateException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.jboss.netty.handler.timeout.ReadTimeoutException</exception>
+                    <exception>org.apache.camel.CamelExchangeException</exception>
+                    <exception>java.net.ConnectException</exception>
+                    <exception>io.netty.handler.timeout.ReadTimeoutException</exception>
+                    <exception>java.lang.IllegalArgumentException</exception>
+                    <exception>org.apache.camel.ExpressionEvaluationException</exception>
+                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                    <setBody id="_setBody3_callCoreInOnly">
+                        <simple>Error:${exception.message}</simple>
+                    </setBody>
+                    <log id="_log4_callCoreInOnly" message="TCP Router Response Body : ${body}"/>
+                </doCatch>
+            </doTry>
+        </route>
         <!-- <route id="_Initialize_Con"> <from id="_from2" uri="timer://foo?repeatCount=1"/> 
 			<doTry id="_doTry5"> <log id="_log2" message="Initialize TCP Connection to 
 			Core"/> <setBody id="_setBody1"> <simple>0025INITIALIZE CONNECTION</simple> 
@@ -327,6 +454,21 @@
 			<setBody id="_setBody_InitCon"> <simple>Error:${exception.message}</simple> 
 			</setBody> <log id="_log_InitCon" message="TCP Router Response Body : ${body}"/> 
 			</doCatch> </doTry> </route> -->
+        <route id="_route_inquiry">
+            <from id="_from2" uri="seda:inquiry?exchangePattern=InOnly"/>
+            <to id="_to1__AYOPINQ" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to3" uri="mock:result"/>
+        </route>
+        <route id="_route_payment">
+            <from id="_from3" uri="seda:payment?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
+            <to id="_to6" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to7" uri="mock:result"/>
+        </route>
+        <route id="_route_status">
+            <from id="_from4" uri="seda:status?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
+            <to id="_to8" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to9" uri="mock:result"/>
+        </route>
     </camelContext>
     <!-- ================================== -->
     <!-- Define netty codecs -->
@@ -340,4 +482,5 @@
     <bean class="com.netty.fuse.GenerateFLDum" id="generateResultDum" scope="singleton"/>
     <bean class="com.netty.fuse.GenerateCounter" id="generateCounter" scope="singleton"/>
     <bean class="com.netty.fuse.KillRoute" id="killRoute" scope="singleton"/>
+    <bean class="com.netty.fuse.Cleansing" id="cleansing" scope="singleton"/>
 </beans>
