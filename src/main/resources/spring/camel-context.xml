@@ -36,7 +36,6 @@
         <route id="TCP_Router_1_way">
             <from id="_toCore" uri="netty4:tcp://0.0.0.0:49810?sync=false&amp;disconnectOnNoReply=false&amp;allowDefaultCodec=false&amp;autoAppendDelimiter=false&amp;decoders=#string-decoder&amp;encoders=#string-encoder&amp;textline=true"/>
             <process id="_Init_Strategy" ref="killRoute"/>
-            <bean id="_bean3" method="channelConnected(${body})" ref="tcpTrans"/>
             <doTry id="_doTry1">
                 <log id="_showInput" message="Input HLI TCP Router : ${body}"/>
                 <log id="_log6" message="Substring Switch Code : ${body.substring(4,8)}"/>
@@ -52,7 +51,7 @@
                                 <doTry id="_doTry_callCore_ayopinq">
                                     <throttle id="_throttle1_ayopinq" timePeriodMillis="10000">
                                     <constant>1000</constant>
-                                    <to id="_to4" uri="seda:openedchannel?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
+                                    <to id="_to4" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
                                     <doCatch id="_AllError1_ayopinq">
                                     <!-- catch multiple exceptions -->
@@ -351,10 +350,6 @@
             <from id="_from4" uri="seda:status?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
             <to id="_to8" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
             <to id="_to9" uri="mock:result"/>
-        </route>
-        <route id="_route_opened_channel">
-            <from id="_from5" uri="seda:openedchannel?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
-            <bean id="_bean4" method="sendToTCP(${body})" ref="tcpTrans"/>
         </route>
     </camelContext>
     <!-- ================================== -->
