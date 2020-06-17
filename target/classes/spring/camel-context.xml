@@ -51,7 +51,7 @@
                                 <log id="_log1_ayopinq" message="Selected : AYOPINQ / INQUIRY"/>
                                 <doTry id="_doTry_callCore_ayopinq">
                                     <throttle id="_throttle1_ayopinq" timePeriodMillis="10000">
-                                    <constant>100</constant>
+                                    <constant>1000</constant>
                                     <to id="_to4" uri="seda:openedchannel?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
                                     <doCatch id="_AllError1_ayopinq">
@@ -79,7 +79,7 @@
                                 <log id="_log1_ayopsts" message="Selected : AYOPSTS / STATUS"/>
                                 <doTry id="_doTry_callCore_ayopsts">
                                     <throttle id="_throttle1_ayopsts" timePeriodMillis="10000">
-                                    <constant>100</constant>
+                                    <constant>1000</constant>
                                     <to
                                     id="_to_corebanking1_ayopsts" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
@@ -108,7 +108,7 @@
                                 <log id="_log1_ayopymn" message="Selected : AYOPYMN / PAYMENT"/>
                                 <doTry id="_doTry_callCore_ayopymn">
                                     <throttle id="_throttle1_ayopymn" timePeriodMillis="10000">
-                                    <constant>100</constant>
+                                    <constant>1000</constant>
                                     <to
                                     id="_to_corebanking1_ayopymn" uri="seda:coreinonly?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
                                     </throttle>
@@ -143,7 +143,7 @@
                                 <log id="_log7_AYOPINQ" message="Selected : AYOPINQ / AYOPOP INQUIRY"/>
                                 <doTry id="_doTry3_AYOPINQ">
                                     <throttle id="_throttle2_AYOPINQ" timePeriodMillis="10000">
-                                    <constant>2</constant>
+                                    <constant>1000</constant>
                                     <!-- <to id="_to1__AYOPINQ" uri="http4://localhost:7081/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
                                     <!-- <inOnly id="_inOnly3" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry"/> -->
                                     <!-- <to id="_to1__AYOPINQ" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
@@ -175,7 +175,7 @@
                                 <log id="_log7_AYOPYMN" message="Selected : AYOPYMN / AYOPOP PAYMENT"/>
                                 <doTry id="_doTry3_AYOPYMN">
                                     <throttle id="_throttle2_AYOPYMN" timePeriodMillis="10000">
-                                    <constant>2</constant>
+                                    <constant>1000</constant>
                                     <!-- <inOnly id="_inOnly1" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/payment" 
 											/> -->
                                     <!-- <to id="_to1__AYOPYMN" uri="http4://localhost:7081/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
@@ -208,7 +208,7 @@
                                 <log id="_log7_AYOPSTA" message="Selected : AYOPSTA / AYOPOP STATUS"/>
                                 <doTry id="_doTry3_AYOPSTA">
                                     <throttle id="_throttle2_AYOPSTA" timePeriodMillis="10000">
-                                    <constant>2</constant>
+                                    <constant>1000</constant>
                                     <!-- <inOnly id="_inOnly2" uri="http://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status" 
 											/> -->
                                     <!-- <to id="_to1__AYOPSTA" uri="http4://integ-ayopop-apim.apps.ocp-dev.hanabank.co.id/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/> -->
