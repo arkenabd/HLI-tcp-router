@@ -338,17 +338,17 @@
 			</doCatch> </doTry> </route> -->
         <route id="_route_inquiry">
             <from id="_from2" uri="seda:inquiry?exchangePattern=InOnly"/>
-            <to id="_to1__AYOPINQ" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to1__AYOPINQ" uri="http4://{{ayopop.address}}/ayp/inquiry?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
             <to id="_to3" uri="mock:result"/>
         </route>
         <route id="_route_payment">
             <from id="_from3" uri="seda:payment?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
-            <to id="_to6" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to6" uri="http4://{{ayopop.address}}/ayp/payment?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
             <to id="_to7" uri="mock:result"/>
         </route>
         <route id="_route_status">
             <from id="_from4" uri="seda:status?exchangePattern=InOnly&amp;waitForTaskToComplete=Never"/>
-            <to id="_to8" uri="http4://{{ayopop.address}}/hanabank/integ/ayopop/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
+            <to id="_to8" uri="http4://{{ayopop.address}}/ayp/status?bridgeEndpoint=true&amp;connectionClose=true&amp;throwExceptionOnFailure=false"/>
             <to id="_to9" uri="mock:result"/>
         </route>
     </camelContext>
